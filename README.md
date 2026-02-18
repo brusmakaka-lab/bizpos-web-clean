@@ -339,8 +339,19 @@ Configurar en el proyecto destino (Preview/Production según estrategia):
 - `DATABASE_URL`
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
+- `SENTRY_DSN` (si usás Sentry)
+- `NEXT_PUBLIC_SENTRY_DSN` (si usás Sentry en cliente)
+- `GEMINI_API_KEY` (si activás integración Gemini)
+- `CLOUDINARY_CLOUD_NAME` (si activás media en Cloudinary)
+- `CLOUDINARY_API_KEY` (si activás media en Cloudinary)
+- `CLOUDINARY_API_SECRET` (si activás media en Cloudinary)
 - `SEED_ADMIN_EMAIL` (opcional para seed controlado)
 - `SEED_ADMIN_PASSWORD` (opcional para seed controlado)
+
+Nota de estabilidad Vercel/Prisma:
+
+- El proyecto ejecuta `prisma generate` en `postinstall` y también antes de `next build`.
+- Esto evita errores de build tipo `Failed to collect page data for /api/auth/[...nextauth]` por Prisma Client no generado.
 
 ### 8.3 Migraciones en entorno destino
 
