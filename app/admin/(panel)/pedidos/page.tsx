@@ -7,13 +7,14 @@ import { currency } from "@/lib/utils";
 const statuses = Object.values(OrderStatus);
 
 type AdminPedidosPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     ok?: string;
     error?: string;
-  };
+  }>;
 };
 
 export default async function AdminPedidosPage({ searchParams }: AdminPedidosPageProps) {
+  const params = await searchParams;
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: "desc" },
     include: {
@@ -24,8 +25,8 @@ export default async function AdminPedidosPage({ searchParams }: AdminPedidosPag
       },
     },
   });
-  const ok = searchParams?.ok;
-  const error = searchParams?.error;
+  const ok = params?.ok;
+  const error = params?.error;
 
   return (
     <section className="space-y-4">

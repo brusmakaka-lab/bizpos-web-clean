@@ -119,3 +119,5 @@ export function CartCheckoutForm() {
     </section>
   );
 }
+
+export default CartCheckoutForm;

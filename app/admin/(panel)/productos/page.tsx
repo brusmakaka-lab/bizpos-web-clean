@@ -7,19 +7,20 @@ import { prisma } from "@/lib/prisma";
 import { currency } from "@/lib/utils";
 
 type AdminProductosPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     ok?: string;
     error?: string;
-  };
+  }>;
 };
 
 export default async function AdminProductosPage({ searchParams }: AdminProductosPageProps) {
+  const params = await searchParams;
   const [categories, products] = await Promise.all([
     prisma.category.findMany({ where: { isActive: true }, orderBy: { name: "asc" } }),
     prisma.product.findMany({ orderBy: { createdAt: "desc" }, include: { category: true } }),
   ]);
-  const ok = searchParams?.ok;
-  const error = searchParams?.error;
+  const ok = params?.ok;
+  const error = params?.error;
 
   return (
     <section className="space-y-4">

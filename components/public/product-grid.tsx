@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Category, Product } from "@prisma/client";
 
-import { AddToCartButton } from "@/components/public/add-to-cart-button";
+import AddToCartButton from "@/components/public/add-to-cart-button";
 import { currency } from "@/lib/utils";
 
 type ProductWithCategory = Product & {

@@ -1,13 +1,14 @@
 import { loginAction } from "@/app/actions/auth-actions";
 
 type AdminLoginPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     error?: string;
-  };
+  }>;
 };
 
-export default function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
-  const error = searchParams?.error;
+export default async function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
+  const params = await searchParams;
+  const error = params?.error;
 
   return (
     <main className="container-page flex min-h-[70vh] items-center justify-center">

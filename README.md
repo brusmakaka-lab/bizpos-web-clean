@@ -263,3 +263,57 @@ vercel --prod=false
 - No hay endpoints `/api/products` o `/api/orders` para CRUD.
 - Se usa `app/api/auth/[...nextauth]/route.ts` sólo para handshake de NextAuth.
 - Todo CRUD funcional ocurre vía Server Actions.
+
+## 7) Estado Fase 4 (hardening final)
+
+### 7.1 Checklist final
+
+- [x] Lint unificado con config flat (`eslint.config.mjs`) y script `npm run lint` estable.
+- [x] Warning bcrypt/edge mitigado: middleware desacoplado de `auth` usando `getToken` y auth con `bcryptjs`.
+- [x] Tests Vitest para acciones críticas:
+  - `loginAction`
+  - `createProductAction`
+  - `createCategoryAction`
+- [x] E2E Playwright flujo crítico (catálogo → checkout → admin/pedidos) con reset + seed de DB en `globalSetup`.
+- [x] Job E2E separado en CI para ejecución manual/nightly.
+
+### 7.2 Validación ejecutada
+
+Comandos verificados en local:
+
+```bash
+npm run lint
+npm test
+npm run build
+npx prisma validate
+npm run test:e2e
+```
+
+Resultado:
+
+- Lint OK
+- Unit tests OK
+- Build OK
+- Prisma schema OK
+- E2E crítico OK
+
+### 7.3 Estrategia de versión y tags
+
+Convención recomendada:
+
+- `v0.x.y` mientras el producto esté en etapa pre-1.0.
+- Incremento de versión:
+  - `x` (minor): nuevas funcionalidades de negocio.
+  - `y` (patch): fixes, hardening y ajustes internos.
+
+Tag sugerido para este hito (Fase 4 cerrada):
+
+```bash
+git add .
+git commit -m "chore: cierre fase 4 (seguridad, observabilidad, tests y e2e)"
+git tag -a v0.4.0 -m "Fase 4 estable"
+git push origin <rama-actual>
+git push origin v0.4.0
+```
+
+> Si ya existe `v0.4.0`, usar `v0.4.1` para el siguiente cierre incremental.

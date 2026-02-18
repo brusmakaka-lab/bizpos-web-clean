@@ -6,16 +6,17 @@ import {
 import { prisma } from "@/lib/prisma";
 
 type AdminCategoriasPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     ok?: string;
     error?: string;
-  };
+  }>;
 };
 
 export default async function AdminCategoriasPage({ searchParams }: AdminCategoriasPageProps) {
+  const params = await searchParams;
   const categories = await prisma.category.findMany({ orderBy: { createdAt: "desc" } });
-  const ok = searchParams?.ok;
-  const error = searchParams?.error;
+  const ok = params?.ok;
+  const error = params?.error;
 
   return (
     <section className="space-y-4">

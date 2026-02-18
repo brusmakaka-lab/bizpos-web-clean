@@ -1,21 +1,23 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { AddToCartButton } from "@/components/public/add-to-cart-button";
+import AddToCartButton from "@/components/public/add-to-cart-button";
 import { PublicHeader } from "@/components/public/public-header";
 import { prisma } from "@/lib/prisma";
 import { currency } from "@/lib/utils";
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export default async function ProductoDetallePage({ params }: Props) {
+  const { id } = await params;
+
   const [business, product] = await Promise.all([
     prisma.business.findFirst(),
-    prisma.product.findUnique({ where: { id: params.id }, include: { category: true } }),
+    prisma.product.findUnique({ where: { id }, include: { category: true } }),
   ]);
 
   if (!product || !product.isActive) {

@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { OrderStatus } from "@prisma/client";
 
+import { logServerError } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
+import { getRequestContext } from "@/lib/request-context";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { orderSchema } from "@/lib/validations";
 
 type CheckoutItem = {
@@ -44,6 +47,20 @@ function buildWhatsAppMessage(params: {
 }
 
 export async function createOrderAction(formData: FormData): Promise<OrderActionResult> {
+  const context = await getRequestContext();
+
+  const rateLimit = checkRateLimit("createOrderAction", context.ip, {
+    limit: 8,
+    windowMs: 60_000,
+  });
+
+  if (!rateLimit.allowed) {
+    return {
+      whatsappUrl: "",
+      error: "Demasiados intentos de checkout. Reintentá en 1 minuto.",
+    };
+  }
+
   const rawItems = String(formData.get("items") ?? "[]");
   let parsedItems: CheckoutItem[] = [];
 
@@ -179,6 +196,13 @@ export async function createOrderAction(formData: FormData): Promise<OrderAction
       whatsappUrl: `https://wa.me/${result.phone}?text=${encodedText}`,
     };
   } catch (error) {
+    logServerError("createOrderAction", error, {
+      customerName: payload.customerName,
+      itemCount: payload.items.length,
+      requestId: context.requestId,
+      ip: context.ip,
+    });
+
     const message = error instanceof Error ? error.message : "No se pudo crear el pedido.";
     return {
       whatsappUrl: "",

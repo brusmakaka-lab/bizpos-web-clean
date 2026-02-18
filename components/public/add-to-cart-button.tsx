@@ -41,3 +41,5 @@ export function AddToCartButton({ productId, name, price }: Props) {
   );
 }
 
+export default AddToCartButton;
+
