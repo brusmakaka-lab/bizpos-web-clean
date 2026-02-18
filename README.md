@@ -317,3 +317,59 @@ git push origin v0.4.0
 ```
 
 > Si ya existe `v0.4.0`, usar `v0.4.1` para el siguiente cierre incremental.
+
+## 8) Guía de deploy final (Release Candidate)
+
+### 8.1 Preflight local obligatorio
+
+Antes de desplegar RC, ejecutar:
+
+```bash
+npm run lint
+npm test
+npm run build
+npx prisma validate
+npm run test:e2e
+```
+
+### 8.2 Variables mínimas en Vercel
+
+Configurar en el proyecto destino (Preview/Production según estrategia):
+
+- `DATABASE_URL`
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+- `SEED_ADMIN_EMAIL` (opcional para seed controlado)
+- `SEED_ADMIN_PASSWORD` (opcional para seed controlado)
+
+### 8.3 Migraciones en entorno destino
+
+Usar siempre deploy migration (no `migrate dev`):
+
+```bash
+npx prisma migrate deploy
+```
+
+Seed solo si es un entorno nuevo y controlado:
+
+```bash
+npm run db:seed
+```
+
+### 8.4 Smoke tests post-deploy
+
+Validar al menos:
+
+1. `/` (catálogo carga)
+2. `/checkout` (creación de pedido y link WhatsApp)
+3. `/admin/login` (login admin)
+4. `/admin/pedidos` (pedido visible y cambio de estado)
+
+### 8.5 Criterio de promoción RC → estable
+
+Promover a estable cuando:
+
+- CI validate en verde
+- E2E crítico en verde
+- smoke test manual en staging OK
+- sin errores críticos en Sentry por 24h
